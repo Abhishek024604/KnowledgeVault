@@ -1,17 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Settings, FileText, Link as LinkIcon, StickyNote } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Settings, FileText, Link as LinkIcon, StickyNote, Trash2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
 export default function TopicView() {
   const { id: topicId } = useParams();
   const [filter, setFilter] = useState('All');
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Reset filter to 'All' when navigating to a new topic
   useEffect(() => {
     setFilter('All');
   }, [topicId]);
+
+  const deleteTopicMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/topics/${topicId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['topics'] });
+      navigate('/');
+    }
+  });
+
+  const handleDeleteTopic = () => {
+    if (window.confirm('Are you sure you want to delete this entire topic AND all its entries? This cannot be undone.')) {
+      deleteTopicMutation.mutate();
+    }
+  };
 
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ['entries', topicId],
@@ -48,9 +66,16 @@ export default function TopicView() {
             <p className="text-muted-foreground font-medium mt-1">{topic?.entryCount || 0} entries</p>
           </div>
         </div>
-        <button className="p-2 brutal-border hover:bg-muted">
-          <Settings size={20} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={handleDeleteTopic}
+            disabled={deleteTopicMutation.isPending}
+            className="p-2 border-2 border-destructive text-destructive brutal-shadow hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-destructive hover:text-white transition-all disabled:opacity-50"
+            title="Delete Topic"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}

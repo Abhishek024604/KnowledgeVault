@@ -36,4 +36,27 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
+// Delete a topic and all its entries
+router.delete('/:id', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    
+    const topic = await prisma.topic.findUnique({ where: { id } });
+    if (!topic || topic.userId !== user.id) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    // Delete all entries associated with this topic
+    await prisma.entry.deleteMany({ where: { topicId: id } });
+    
+    // Delete the topic itself
+    await prisma.topic.delete({ where: { id } });
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
