@@ -1,0 +1,61 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firebaseId String  @unique
+  email     String   @unique
+  name      String?
+  topics    Topic[]
+  entries   Entry[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Topic {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  icon       String?
+  color      String?
+  entryCount Int      @default(0)
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  entries    Entry[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Entry {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  type        String   // "Link", "File", "Note"
+  title       String
+  url         String?
+  coverImage  String?
+  fileName    String?
+  fileUrl     String?
+  content     String?
+  summary     String?
+  reflection  String?
+  isArchived  Boolean  @default(false)
+  topicId     String   @db.ObjectId
+  topic       Topic    @relation(fields: [topicId], references: [id])
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  tags        Tag[]    @relation(fields: [tagIds], references: [id])
+  tagIds      String[] @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String   @unique
+  entryIds String[] @db.ObjectId
+  entries  Entry[]  @relation(fields: [entryIds], references: [id])
+}
