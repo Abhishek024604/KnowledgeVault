@@ -26,6 +26,35 @@ export default function EntryDetail() {
     }
   }, [entry, id]);
 
+  const handleShare = async () => {
+    const shareUrl = entry.url || window.location.href;
+    const shareTitle = entry.title || 'Knoledge Entry';
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          url: shareUrl
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          copyToClipboard(shareUrl);
+        }
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy', err);
+      alert('Failed to copy link. You can manually copy it from the address bar.');
+    });
+  };
+
   const updateReflectionMutation = useMutation({
     mutationFn: async (text) => {
       const res = await api.put(`/entries/${id}`, { reflection: text });
@@ -60,7 +89,11 @@ export default function EntryDetail() {
           Back to {entry.topic?.name || 'Topic'}
         </Link>
         <div className="flex gap-2">
-          <button className="p-2 border-2 border-foreground hover:bg-muted bg-card">
+          <button 
+            onClick={handleShare}
+            className="p-2 border-2 border-foreground hover:bg-muted bg-card"
+            title="Share or copy link"
+          >
             <Share2 size={18} />
           </button>
           <button 
