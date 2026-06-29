@@ -54,12 +54,12 @@ export default function TopicView() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex items-center gap-6 border-b-2 border-foreground">
+      <div className="flex items-center gap-4 sm:gap-6 border-b-2 border-foreground overflow-x-auto no-scrollbar">
         {['All', 'Links', 'Files', 'Notes'].map(tab => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`pb-3 px-3 font-bold text-sm uppercase tracking-wide border-b-4 transition-all ${filter === tab ? 'border-foreground text-foreground bg-foreground/5' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-foreground/30'}`}
+            className={`pb-3 px-3 font-bold text-sm uppercase tracking-wide border-b-4 transition-all whitespace-nowrap ${filter === tab ? 'border-foreground text-foreground bg-foreground/5' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-foreground/30'}`}
           >
             {tab} <span className="ml-1 opacity-50">
               {tab === 'All' ? entries.length : entries.filter(e => e.type === (tab === 'Links' ? 'Link' : tab === 'Files' ? 'File' : 'Note')).length}

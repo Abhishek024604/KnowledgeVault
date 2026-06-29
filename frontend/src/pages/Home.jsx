@@ -47,12 +47,12 @@ export default function Home() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Your library</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Your library</h1>
         <select 
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="bg-transparent border-2 border-foreground p-2 font-bold outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+          className="bg-transparent border-2 border-foreground p-2 font-bold outline-none focus:ring-2 focus:ring-primary cursor-pointer w-full sm:w-auto"
         >
           <option value="Last updated">Last updated</option>
           <option value="A-Z">A-Z</option>

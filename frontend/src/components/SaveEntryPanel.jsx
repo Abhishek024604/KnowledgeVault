@@ -113,7 +113,7 @@ export default function SaveEntryPanel({ isOpen, onClose, shareData }) {
           <motion.div 
             initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-[400px] bg-background border-l-4 border-foreground z-50 flex flex-col brutal-shadow"
+            className="fixed right-0 top-0 bottom-0 w-full sm:w-[400px] bg-background border-l-4 border-foreground z-50 flex flex-col brutal-shadow"
           >
             <div className="flex items-center justify-between p-6 border-b-2 border-foreground">
               <h2 className="text-xl font-bold">Save an entry</h2>
