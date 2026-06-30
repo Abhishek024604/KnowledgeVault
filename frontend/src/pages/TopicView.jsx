@@ -21,7 +21,7 @@ export default function TopicView() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['topics'] });
-      navigate('/');
+      navigate('/app');
     }
   });
 
@@ -98,7 +98,7 @@ export default function TopicView() {
         {filteredEntries.map(entry => (
           <Link
             key={entry.id}
-            to={`/entry/${entry.id}`}
+            to={`/app/entry/${entry.id}`}
             className="block break-inside-avoid bg-card brutal-border p-5 brutal-shadow hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
           >
             <div className="flex items-center gap-2 mb-3">

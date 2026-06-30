@@ -1,7 +1,7 @@
 {
   "name": "Knoledge",
   "short_name": "Knoledge",
-  "start_url": "/",
+  "start_url": "/app",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
@@ -14,7 +14,7 @@
     }
   ],
   "share_target": {
-    "action": "/",
+    "action": "/app",
     "method": "GET",
     "enctype": "application/x-www-form-urlencoded",
     "params": {

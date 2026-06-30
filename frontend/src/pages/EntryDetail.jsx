@@ -73,7 +73,7 @@ export default function EntryDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['entries'] });
       queryClient.invalidateQueries({ queryKey: ['topics'] });
-      navigate('/');
+      navigate('/app');
     }
   });
 
@@ -84,7 +84,7 @@ export default function EntryDetail() {
     <div className="max-w-6xl mx-auto animate-in fade-in duration-500 pb-20">
       {/* Breadcrumb & Actions */}
       <div className="flex items-center justify-between mb-8">
-        <Link to={`/topic/${entry.topicId}`} className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground">
+        <Link to={`/app/topic/${entry.topicId}`} className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground">
           <ArrowLeft size={16} />
           Back to {entry.topic?.name || 'Topic'}
         </Link>

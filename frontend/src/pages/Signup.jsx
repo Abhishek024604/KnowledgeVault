@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -8,8 +8,14 @@ export default function Signup() {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const { signup, currentUser } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/app');
+    }
+  }, [currentUser, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -17,7 +23,7 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signup(email, password, username);
-      navigate('/');
+      navigate('/app');
     } catch (err) {
       setError('Failed to create an account: ' + err.message);
     }

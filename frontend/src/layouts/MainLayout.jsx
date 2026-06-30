@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Search, Plus, LayoutGrid, Library, Settings, LogOut, Menu, X as XIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +13,7 @@ export default function MainLayout() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const share_title = searchParams.get('share_title');
@@ -76,13 +77,21 @@ export default function MainLayout() {
               <p className="text-xs font-bold uppercase text-muted-foreground mb-2">Library</p>
               <ul className="space-y-1">
                 <li>
-                  <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 p-2 hover:bg-muted font-medium brutal-border">
+                  <Link 
+                    to="/app" 
+                    onClick={() => setIsMobileMenuOpen(false)} 
+                    className={`flex items-center gap-2 p-2 font-medium border-2 transition-all ${
+                      location.pathname === '/app' || location.pathname === '/app/' 
+                      ? 'bg-primary text-primary-foreground border-foreground translate-x-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                      : 'border-transparent hover:bg-muted'
+                    }`}
+                  >
                     <LayoutGrid size={18} />
                     All topics
                   </Link>
                 </li>
                 <li>
-                  <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 p-2 hover:bg-muted font-medium">
+                  <Link to="/app" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 p-2 hover:bg-muted font-medium">
                     <Library size={18} />
                     Revisit queue
                   </Link>
@@ -96,14 +105,25 @@ export default function MainLayout() {
                 <span className="text-foreground">{topics.length}</span>
               </p>
               <ul className="space-y-1">
-                {topics.map((topic) => (
-                  <li key={topic.id}>
-                    <Link to={`/topic/${topic.id}`} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 p-2 hover:bg-muted text-sm font-medium break-words">
-                      <span className={`w-2 h-2 rounded-full ${topic.color || 'bg-primary'} shrink-0`}></span>
-                      <span className="truncate">{topic.name}</span>
-                    </Link>
-                  </li>
-                ))}
+                {topics.map((topic) => {
+                  const isActive = location.pathname.startsWith(`/app/topic/${topic.id}`);
+                  return (
+                    <li key={topic.id}>
+                      <Link 
+                        to={`/app/topic/${topic.id}`} 
+                        onClick={() => setIsMobileMenuOpen(false)} 
+                        className={`flex items-center gap-2 p-2 text-sm font-medium break-words border-2 transition-all ${
+                          isActive 
+                          ? 'bg-foreground text-background border-foreground translate-x-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                          : 'border-transparent hover:bg-muted'
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${topic.color || 'bg-primary'} shrink-0 ${isActive ? 'ring-1 ring-background' : ''}`}></span>
+                        <span className="truncate">{topic.name}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </nav>

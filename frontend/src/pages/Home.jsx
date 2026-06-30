@@ -64,7 +64,7 @@ export default function Home() {
         {sortedTopics.map(topic => (
           <Link 
             key={topic.id}
-            to={`/topic/${topic.id}`}
+            to={`/app/topic/${topic.id}`}
             className="block group bg-card brutal-border p-5 brutal-shadow hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
           >
             {/* Collage mockup */}
