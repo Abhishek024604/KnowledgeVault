@@ -9,7 +9,7 @@ import EntryDetail from './pages/EntryDetail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Landing from './pages/Landing';
-import Pricing from './pages/Pricing';
+// import Pricing from './pages/Pricing';
 
 const queryClient = new QueryClient();
 
@@ -22,7 +22,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/" element={<Landing />} />
-            <Route path="/pricing" element={<Pricing />} />
+            {/* <Route path="/pricing" element={<Pricing />} /> */}
             <Route path="/app" element={
               <PrivateRoute>
                 <MainLayout />

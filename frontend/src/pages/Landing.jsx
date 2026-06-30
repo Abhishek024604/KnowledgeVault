@@ -20,7 +20,7 @@ export default function Landing() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#about" className="font-bold uppercase tracking-wider text-sm hover:text-primary transition-colors">About</a>
               <Link to="/app" className="font-bold uppercase tracking-wider text-sm hover:text-primary transition-colors">Playground</Link>
-              <Link to="/pricing" className="font-bold uppercase tracking-wider text-sm hover:text-primary transition-colors">Pricing</Link>
+              {/* <Link to="/pricing" className="font-bold uppercase tracking-wider text-sm hover:text-primary transition-colors">Pricing</Link> */}
             </div>
 
             <div className="flex items-center gap-4">
