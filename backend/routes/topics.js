@@ -58,4 +58,27 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
+// Update a topic (rename)
+router.patch('/:id', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+    const user = req.dbUser;
+    
+    const topic = await prisma.topic.findUnique({ where: { id } });
+    if (!topic || topic.userId !== user.id) {
+      return res.status(404).json({ error: 'Topic not found' });
+    }
+
+    const updatedTopic = await prisma.topic.update({
+      where: { id },
+      data: { name }
+    });
+    
+    res.json(updatedTopic);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

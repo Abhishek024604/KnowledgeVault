@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Settings, FileText, Link as LinkIcon, StickyNote, Trash2 } from 'lucide-react';
+import { Settings, FileText, Link as LinkIcon, StickyNote, Trash2, Edit2, Check, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
@@ -13,7 +13,36 @@ export default function TopicView() {
   // Reset filter to 'All' when navigating to a new topic
   useEffect(() => {
     setFilter('All');
+    setIsEditing(false);
   }, [topicId]);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+
+  const updateTopicMutation = useMutation({
+    mutationFn: async (newName) => {
+      const res = await api.patch(`/topics/${topicId}`, { name: newName });
+      return res.data;
+    },
+    onSuccess: (updatedTopic) => {
+      queryClient.setQueryData(['topic', topicId], updatedTopic);
+      queryClient.invalidateQueries({ queryKey: ['topics'] });
+      setIsEditing(false);
+    }
+  });
+
+  const handleEditClick = () => {
+    setEditName(topic?.name || '');
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editName.trim() && editName !== topic?.name) {
+      updateTopicMutation.mutate(editName.trim());
+    } else {
+      setIsEditing(false);
+    }
+  };
 
   const deleteTopicMutation = useMutation({
     mutationFn: async () => {
@@ -66,7 +95,46 @@ export default function TopicView() {
             {topic?.name ? topic.name.charAt(0) : 'T'}
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{topic?.name || 'Topic'}</h1>
+            {isEditing ? (
+              <div className="flex items-center gap-2 mb-1">
+                <input 
+                  type="text" 
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveEdit();
+                    if (e.key === 'Escape') setIsEditing(false);
+                  }}
+                  autoFocus
+                  className="text-3xl font-bold tracking-tight bg-transparent border-b-2 border-foreground outline-none px-1 py-0 w-full sm:w-64"
+                />
+                <button 
+                  onClick={handleSaveEdit}
+                  disabled={updateTopicMutation.isPending}
+                  className="p-1 bg-primary text-primary-foreground brutal-border hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+                >
+                  <Check size={20} />
+                </button>
+                <button 
+                  onClick={() => setIsEditing(false)}
+                  disabled={updateTopicMutation.isPending}
+                  className="p-1 bg-muted brutal-border hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight">{topic?.name || 'Topic'}</h1>
+                <button 
+                  onClick={handleEditClick}
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                  title="Rename Topic"
+                >
+                  <Edit2 size={16} />
+                </button>
+              </div>
+            )}
             <p className="text-muted-foreground font-medium mt-1">{topic?.entryCount || 0} entries</p>
           </div>
         </div>
