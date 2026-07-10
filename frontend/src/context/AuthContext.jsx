@@ -57,14 +57,26 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
-    signup,
     login,
+    signup,
     logout
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 transition-opacity duration-300">
+          <div className="flex items-center gap-3 animate-pulse">
+            <span className="w-8 h-8 rounded-full bg-primary brutal-border inline-block shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"></span>
+            <span className="font-black text-3xl tracking-tighter uppercase text-foreground">Knoledge</span>
+          </div>
+          <div className="mt-8 flex gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+          </div>
+        </div>
+      ) : children}
     </AuthContext.Provider>
   );
 }

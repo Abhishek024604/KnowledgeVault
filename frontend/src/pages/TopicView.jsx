@@ -44,6 +44,10 @@ export default function TopicView() {
     queryFn: async () => {
       const res = await api.get('/topics');
       return res.data.find(t => t.id === topicId) || {};
+    },
+    initialData: () => {
+      const allTopics = queryClient.getQueryData(['topics']);
+      return allTopics?.find(t => t.id === topicId);
     }
   });
 

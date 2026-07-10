@@ -9,10 +9,12 @@ export default function Landing() {
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
+    const searchParams = window.location.search;
+    
     if (currentUser) {
-      navigate('/app');
+      navigate(`/app${searchParams}`);
     } else if (isMobile) {
-      navigate('/login');
+      navigate(`/login${searchParams}`);
     }
   }, [currentUser, navigate]);
 

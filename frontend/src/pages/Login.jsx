@@ -12,7 +12,8 @@ export default function Login() {
 
   useEffect(() => {
     if (currentUser) {
-      navigate('/app');
+      const searchParams = window.location.search;
+      navigate(`/app${searchParams}`);
     }
   }, [currentUser, navigate]);
 
@@ -22,7 +23,8 @@ export default function Login() {
       setError('');
       setLoading(true);
       await login(email, password);
-      navigate('/app');
+      const searchParams = window.location.search;
+      navigate(`/app${searchParams}`);
     } catch (err) {
       setError('Failed to log in: ' + err.message);
     }

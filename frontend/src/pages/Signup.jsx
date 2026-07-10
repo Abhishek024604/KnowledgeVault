@@ -13,7 +13,8 @@ export default function Signup() {
 
   useEffect(() => {
     if (currentUser) {
-      navigate('/app');
+      const searchParams = window.location.search;
+      navigate(`/app${searchParams}`);
     }
   }, [currentUser, navigate]);
 
@@ -23,7 +24,8 @@ export default function Signup() {
       setError('');
       setLoading(true);
       await signup(email, password, username);
-      navigate('/app');
+      const searchParams = window.location.search;
+      navigate(`/app${searchParams}`);
     } catch (err) {
       setError('Failed to create an account: ' + err.message);
     }

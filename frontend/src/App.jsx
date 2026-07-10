@@ -11,7 +11,14 @@ import Signup from './pages/Signup';
 import Landing from './pages/Landing';
 // import Pricing from './pages/Pricing';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false, // Prevents refetching every time you switch apps on mobile
+    },
+  },
+});
 
 function App() {
   return (

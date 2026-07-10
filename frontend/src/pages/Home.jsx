@@ -38,6 +38,17 @@ export default function Home() {
   if (isLoading) return <div className="p-8 text-center font-bold">Loading library...</div>;
   if (error) return <div className="p-8 text-center text-destructive font-bold">Error loading library</div>;
 
+  const prefetchTopic = (topicId) => {
+    queryClient.prefetchQuery({
+      queryKey: ['entries', topicId],
+      queryFn: async () => {
+        const res = await api.get(`/entries?topicId=${topicId}`);
+        return res.data;
+      },
+      staleTime: 1000 * 60 * 5,
+    });
+  };
+
   const sortedTopics = [...topics].sort((a, b) => {
     if (sort === 'Last updated') return new Date(b.updatedAt) - new Date(a.updatedAt);
     if (sort === 'A-Z') return a.name.localeCompare(b.name);
@@ -65,6 +76,8 @@ export default function Home() {
           <Link 
             key={topic.id}
             to={`/app/topic/${topic.id}`}
+            onMouseEnter={() => prefetchTopic(topic.id)}
+            onTouchStart={() => prefetchTopic(topic.id)}
             className="block group bg-card brutal-border p-5 brutal-shadow hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
           >
             {/* Collage mockup */}

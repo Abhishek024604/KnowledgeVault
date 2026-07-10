@@ -15,7 +15,10 @@ export default function SaveEntryPanel({ isOpen, onClose, shareData }) {
 
   useEffect(() => {
     if (isOpen && shareData) {
-      const sharedUrl = shareData.url || (shareData.text && shareData.text.startsWith('http') ? shareData.text : '');
+      const urlMatch = shareData.text ? shareData.text.match(/(https?:\/\/[^\s]+)/) : null;
+      const extractedUrl = urlMatch ? urlMatch[1] : null;
+      const sharedUrl = shareData.url || extractedUrl;
+      
       if (sharedUrl) {
         setActiveTab('Link');
         setUrl(sharedUrl);
