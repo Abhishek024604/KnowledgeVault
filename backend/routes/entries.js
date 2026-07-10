@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 const { requireAuth } = require('../middlewares/auth');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -23,7 +22,7 @@ const upload = multer({ storage: storage });
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { topicId } = req.query;
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const query = {
@@ -47,7 +46,7 @@ router.get('/', requireAuth, async (req, res) => {
 router.get('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const entry = await prisma.entry.findFirst({
@@ -68,7 +67,7 @@ router.put('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     const { reflection } = req.body;
     
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const updatedEntry = await prisma.entry.updateMany({
@@ -88,7 +87,7 @@ router.put('/:id', requireAuth, async (req, res) => {
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const entry = await prisma.entry.findFirst({
@@ -140,7 +139,7 @@ router.post('/', requireAuth, upload.single('file'), async (req, res) => {
     let url = req.body.url || null;
     let content = req.body.content || null;
     
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
     const userId = user.id;
     

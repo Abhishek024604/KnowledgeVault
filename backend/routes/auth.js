@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 const { requireAuth } = require('../middlewares/auth');
 
 // Register user in MongoDB after Firebase signup
@@ -29,11 +28,8 @@ router.post('/register', requireAuth, async (req, res) => {
 // Get current user profile
 router.get('/me', requireAuth, async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({ 
-      where: { firebaseId: req.user.uid }
-    });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user);
+    if (!req.dbUser) return res.status(404).json({ error: 'User not found' });
+    res.json(req.dbUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

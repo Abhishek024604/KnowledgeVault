@@ -2,10 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { initializeApp, cert } = require('firebase-admin/app');
-const { PrismaClient } = require('@prisma/client');
-
 const app = express();
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 // Initialize Firebase Admin SDK

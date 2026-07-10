@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 const { requireAuth } = require('../middlewares/auth');
 
 // Get all topics for a user
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const topics = await prisma.topic.findMany({
@@ -25,7 +24,7 @@ router.get('/', requireAuth, async (req, res) => {
 router.post('/', requireAuth, async (req, res) => {
   try {
     const { name, icon, color } = req.body;
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     
     const topic = await prisma.topic.create({
       data: { name, icon, color, userId: user.id }
@@ -40,7 +39,7 @@ router.post('/', requireAuth, async (req, res) => {
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { firebaseId: req.user.uid } });
+    const user = req.dbUser;
     
     const topic = await prisma.topic.findUnique({ where: { id } });
     if (!topic || topic.userId !== user.id) {

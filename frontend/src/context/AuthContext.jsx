@@ -9,6 +9,8 @@ import {
 import { auth } from '../lib/firebase';
 import axios from 'axios';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 const AuthContext = createContext();
 
 export function useAuth() {
@@ -18,6 +20,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   async function signup(email, password, username) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -39,6 +42,7 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    queryClient.clear();
     return signOut(auth);
   }
 

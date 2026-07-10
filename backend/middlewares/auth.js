@@ -1,6 +1,5 @@
 const { getAuth } = require('firebase-admin/auth');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 // Ensure firebase admin is initialized in server.js before this middleware is used
 async function requireAuth(req, res, next) {
@@ -26,6 +25,7 @@ async function requireAuth(req, res, next) {
       });
     }
     
+    req.dbUser = mongoUser;
     next();
   } catch (error) {
     console.error("Auth Middleware Error:", error);

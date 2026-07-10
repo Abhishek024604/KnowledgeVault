@@ -1,9 +1,20 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Share2, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
 
 export default function Landing() {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    if (currentUser) {
+      navigate('/app');
+    } else if (isMobile) {
+      navigate('/login');
+    }
+  }, [currentUser, navigate]);
 
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary selection:text-primary-foreground pb-20">
