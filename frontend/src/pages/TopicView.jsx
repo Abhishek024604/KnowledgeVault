@@ -60,6 +60,35 @@ export default function TopicView() {
     }
   };
 
+  const [editingEntryId, setEditingEntryId] = useState(null);
+  const [editingEntryTitle, setEditingEntryTitle] = useState('');
+
+  const updateEntryTitleMutation = useMutation({
+    mutationFn: async ({ id, title }) => {
+      const res = await api.put(`/entries/${id}`, { title });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entries', topicId] });
+      setEditingEntryId(null);
+    }
+  });
+
+  const handleEditEntryClick = (e, entry) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingEntryId(entry.id);
+    setEditingEntryTitle(entry.title || '');
+  };
+
+  const handleSaveEntryTitle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (editingEntryTitle.trim()) {
+      updateEntryTitleMutation.mutate({ id: editingEntryId, title: editingEntryTitle.trim() });
+    }
+  };
+
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ['entries', topicId],
     queryFn: async () => {
@@ -171,18 +200,73 @@ export default function TopicView() {
           <Link
             key={entry.id}
             to={`/app/entry/${entry.id}`}
+            onClick={(e) => {
+              if (editingEntryId === entry.id) {
+                e.preventDefault();
+              }
+            }}
             className="block break-inside-avoid bg-card brutal-border p-5 brutal-shadow hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
           >
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center justify-between mb-3">
               <span className={`text-xs font-bold px-2 py-1 flex items-center gap-1 brutal-border ${entry.type === 'Link' ? 'bg-blue-100 text-blue-900' : entry.type === 'File' ? 'bg-emerald-100 text-emerald-900' : 'bg-purple-100 text-purple-900'}`}>
                 {entry.type === 'Link' && <LinkIcon size={12} />}
                 {entry.type === 'File' && <FileText size={12} />}
                 {entry.type === 'Note' && <StickyNote size={12} />}
                 {entry.type}
               </span>
+              
+              <button 
+                onClick={(e) => handleEditEntryClick(e, entry)}
+                className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground bg-background px-2 py-1 brutal-border shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px transition-all"
+                title="Edit Title"
+              >
+                <Edit2 size={12} /> Edit Title
+              </button>
             </div>
 
-            <h3 className="font-bold text-xl leading-tight mb-3">{entry.title}</h3>
+            {editingEntryId === entry.id ? (
+              <div className="flex items-center gap-2 mb-3" onClick={e => e.preventDefault()}>
+                <input 
+                  type="text"
+                  value={editingEntryTitle}
+                  onChange={e => setEditingEntryTitle(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleSaveEntryTitle(e);
+                    if (e.key === 'Escape') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setEditingEntryId(null);
+                    }
+                  }}
+                  onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  autoFocus
+                  className="font-bold text-xl leading-tight bg-background border-2 border-foreground outline-none px-2 py-1 w-full"
+                />
+                <button 
+                  onClick={handleSaveEntryTitle} 
+                  disabled={updateEntryTitleMutation.isPending}
+                  className="p-1 bg-primary text-primary-foreground brutal-border hover:translate-x-px hover:translate-y-px shrink-0"
+                >
+                  <Check size={18} />
+                </button>
+                <button 
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    e.stopPropagation(); 
+                    setEditingEntryId(null); 
+                  }} 
+                  disabled={updateEntryTitleMutation.isPending}
+                  className="p-1 bg-muted brutal-border hover:translate-x-px hover:translate-y-px shrink-0"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            ) : (
+              <h3 className="font-bold text-xl leading-tight mb-3">{entry.title}</h3>
+            )}
 
             <p className="text-sm border-l-4 border-indigo-500 pl-3 italic mb-4">
               {entry.type === 'Note' ?
