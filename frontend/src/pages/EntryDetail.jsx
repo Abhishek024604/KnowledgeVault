@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Share2, Edit3, Trash2, Download } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Share2, Edit3, Trash2, Download, Edit2, Check, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
@@ -19,12 +19,41 @@ export default function EntryDetail() {
     }
   });
 
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+
   useEffect(() => {
     if (entry) {
       setReflection(entry.reflection || '');
       setIsEditingReflection(false);
+      setIsEditingTitle(false);
     }
   }, [entry, id]);
+
+  const updateTitleMutation = useMutation({
+    mutationFn: async (newTitle) => {
+      const res = await api.put(`/entries/${id}`, { title: newTitle });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entry', id] });
+      queryClient.invalidateQueries({ queryKey: ['entries'] });
+      setIsEditingTitle(false);
+    }
+  });
+
+  const handleEditTitleClick = () => {
+    setEditTitle(entry?.title || '');
+    setIsEditingTitle(true);
+  };
+
+  const handleSaveTitle = () => {
+    if (editTitle.trim() && editTitle !== entry?.title) {
+      updateTitleMutation.mutate(editTitle.trim());
+    } else {
+      setIsEditingTitle(false);
+    }
+  };
 
   const handleShare = async () => {
     const shareUrl = entry.url || window.location.href;
@@ -133,9 +162,48 @@ export default function EntryDetail() {
             <span className="text-muted-foreground text-sm font-bold">• {new Date(entry.createdAt).toLocaleDateString()}</span>
           </div>
           
-          <h1 className="text-4xl font-bold tracking-tight leading-tight mb-6 max-w-4xl">
-            {entry.title || 'Untitled'}
-          </h1>
+          {isEditingTitle ? (
+            <div className="flex items-center gap-2 mb-6 max-w-4xl">
+              <input 
+                type="text" 
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveTitle();
+                  if (e.key === 'Escape') setIsEditingTitle(false);
+                }}
+                autoFocus
+                className="text-4xl font-bold tracking-tight leading-tight bg-transparent border-b-2 border-foreground outline-none px-1 py-0 w-full"
+              />
+              <button 
+                onClick={handleSaveTitle}
+                disabled={updateTitleMutation.isPending}
+                className="p-2 bg-primary text-primary-foreground brutal-border hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all shrink-0"
+              >
+                <Check size={24} />
+              </button>
+              <button 
+                onClick={() => setIsEditingTitle(false)}
+                disabled={updateTitleMutation.isPending}
+                className="p-2 bg-muted brutal-border hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all shrink-0"
+              >
+                <X size={24} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-start gap-3 mb-6 max-w-4xl group">
+              <h1 className="text-4xl font-bold tracking-tight leading-tight">
+                {entry.title || 'Untitled'}
+              </h1>
+              <button 
+                onClick={handleEditTitleClick}
+                className="p-2 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-all shrink-0 mt-1"
+                title="Rename Entry"
+              >
+                <Edit2 size={20} />
+              </button>
+            </div>
+          )}
           
           <div className="flex gap-2 flex-wrap">
             {(entry.tags || []).map(tag => (

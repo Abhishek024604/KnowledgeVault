@@ -65,14 +65,22 @@ router.get('/:id', requireAuth, async (req, res) => {
 router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { reflection } = req.body;
+    const { reflection, title } = req.body;
     
     const user = req.dbUser;
     if (!user) return res.status(404).json({ error: 'User not found' });
 
+    const dataToUpdate = {};
+    if (reflection !== undefined) dataToUpdate.reflection = reflection;
+    if (title !== undefined) dataToUpdate.title = title;
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      return res.status(400).json({ error: 'No data provided to update' });
+    }
+
     const updatedEntry = await prisma.entry.updateMany({
       where: { id, userId: user.id },
-      data: { reflection }
+      data: dataToUpdate
     });
 
     if (updatedEntry.count === 0) return res.status(404).json({ error: 'Entry not found' });
